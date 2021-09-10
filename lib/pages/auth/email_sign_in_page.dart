@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps/pages/home_page.dart';
 import 'package:maps/services/auth.dart';
 import 'package:maps/widgets/text_form_widget.dart';
@@ -15,6 +18,28 @@ class EmailSignInPage extends StatefulWidget {
 
 class _EmailSignInPageState extends State<EmailSignInPage> {
   FormStatus _formStatus = FormStatus.signIn;
+  final firestoreInstance = FirebaseFirestore.instance;
+
+  late double latitude;
+  late double longitude;
+  void getCurrentLocation() async {
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    var lati = position.latitude;
+    var long = position.longitude;
+
+    // passing this to latitude and longitude strings
+    latitude = lati;
+    longitude = long;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrentLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +48,8 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
         child: _formStatus == FormStatus.signIn
             ? buildSignInForm()
             : _formStatus == FormStatus.register
-            ? buildRegisterForm()
-            : buildResetForm(),
+                ? buildRegisterForm()
+                : buildResetForm(),
       ),
     );
   }
@@ -83,12 +108,12 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 if (_signInFormKey.currentState!.validate()) {
                   final user = await Provider.of<Auth>(context, listen: false)
                       .signWithEmailAndPassword(
-                      _emailController.text, _passwordController.text);
+                          _emailController.text, _passwordController.text);
 
-                  if (!user!.emailVerified) {
-                    await _showMyDialog();
-                    await Provider.of<Auth>(context, listen: false).signOut();
-                  }
+                  // if (!user!.emailVerified) {
+                  //   await _showMyDialog();
+                  //   await Provider.of<Auth>(context, listen: false).signOut();
+                  // }
 
                   Navigator.push(
                     context,
@@ -175,9 +200,21 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
   Widget buildRegisterForm() {
     final _registerFormKey = GlobalKey<FormState>();
     TextEditingController _emailController = TextEditingController();
-    TextEditingController _userNameController = TextEditingController();
     TextEditingController _passwordController = TextEditingController();
     TextEditingController _passwordConfirmController = TextEditingController();
+
+    void _onPressed(){
+      var firebaseUser =  FirebaseAuth.instance.currentUser;
+      firestoreInstance.collection("Users").doc(firebaseUser!.uid).set(
+          {
+            "email" : "${_emailController.text}",
+            "password": _passwordController.text,
+            "latitude": latitude,
+            "longitude": longitude,
+          }).then((_){
+        print("success!");
+      });
+    }
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -189,19 +226,6 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
             Text(
               'Kayıt Formu',
               style: TextStyle(fontSize: 25),
-            ),
-            TextFormWidget(
-              obscureText: false,
-              validator: (value) {
-                if (value!.length < 3) {
-                  return 'Lütfen en az 4 haneli kullanıcı adı giriniz.';
-                } else {
-                  return null;
-                }
-              },
-              controller: _userNameController,
-              hintText: 'Kullanıcı Adı',
-              prefixIcon: Icon(Icons.person),
             ),
             SizedBox(
               height: 10,
@@ -264,9 +288,10 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                       _emailController.text,
                       _passwordController.text,
                     );
-                    if (!user!.emailVerified) {
-                      await user.sendEmailVerification();
-                    }
+                    _onPressed();
+                    // if (!user!.emailVerified) {
+                    //   await user.sendEmailVerification();
+                    // }
                     await _showMyDialog();
                     setState(() {
                       _formStatus = FormStatus.signIn;

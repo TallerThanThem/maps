@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,21 +14,26 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
   var _center;
-  var _currentUser;
-  MapType _currentMapType = MapType.normal;
-
-  void getCurrentUser(){
-    var currentUser = FirebaseAuth.instance.currentUser;
-    if(currentUser != null){
-      _currentUser = currentUser;
-    }
-  }
-
+  var _newCenter;
+  late double newLatitude;
+  late double newLongitude;
   late double latitude;
   late double longitude;
 
-  // function for getting the current location
-  // but before that you need to add this permission!
+  MapType _currentMapType = MapType.normal;
+
+  final firestoreInstance = FirebaseFirestore.instance;
+
+  void onPressed() {
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+    firestoreInstance.collection("Users").doc(firebaseUser!.uid).update({
+      "latitude": latitude,
+      "longitude": longitude,
+    }).then((_) {
+      print("success!");
+    });
+  }
+
   void getCurrentLocation() async {
     var position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -43,6 +49,36 @@ class _MapPageState extends State<MapPage> {
       _center = LatLng(latitude, longitude);
     });
   }
+
+  void onPressedListenLocation() {
+    firestoreInstance
+        .collection("Users")
+        .where("latitude")
+        .where("longitude")
+        .snapshots()
+        .listen((result) {
+      result.docs.forEach((result) {
+        onPressedGetLocation();
+      });
+    });
+  }
+
+  void onPressedGetLocation() {
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+    firestoreInstance
+        .collection("Users")
+        .doc(firebaseUser!.uid)
+        .get()
+        .then((value) {
+      newLatitude = value.data()!["latitude"];
+      newLongitude = value.data()!["longitude"];
+      setState(() {
+        _center = LatLng(newLatitude, newLongitude);
+      });
+    });
+  }
+
+  var myId;
 
   void _onMapTypeButtonPressed() {
     setState(() {
@@ -61,6 +97,8 @@ class _MapPageState extends State<MapPage> {
       ),
     };
   }
+
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   @override
   void initState() {
@@ -90,6 +128,17 @@ class _MapPageState extends State<MapPage> {
         markerAndLocationPress: () {
           getCurrentLocation();
           _createMarker();
+        },
+        onpress: onPressed,
+        longPress: (LatLng latLng) {
+          var markerIdVal = markers.length + 1;
+          String mar = markerIdVal.toString();
+          final MarkerId markerId = MarkerId(mar);
+          final Marker marker = Marker(markerId: markerId, position: _center);
+
+          setState(() {
+            markers[markerId] = marker;
+          });
         },
       ),
     );

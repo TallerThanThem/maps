@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:maps/pages/auth/email_sign_in_page.dart';
+import 'package:maps/pages/firebase/user_add.dart';
 import 'package:maps/pages/home_page.dart';
 import 'package:maps/services/auth.dart';
 import 'package:maps/widgets/my_raised_button.dart';
@@ -13,35 +14,20 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   bool _isLoading = false;
-  final firestoreInstance = FirebaseFirestore.instance;
-
-
-  // void _onPressed() {
-  //   firestoreInstance.collection("users").add({
-  //     "username": "eren",
-  //     "email": "erenkara@hotmail.com",
-  //     "password": 12345,
-  //     "latitude": 40.2192579,
-  //     "longitude": 28.9516985,
-  //   });
-  // }
-
-  void _onPressed() {
-    firestoreInstance.collection("Users").doc().get().then((value){
-      print(value.data());
-    });
-  }
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<void> _signInAnonymously() async {
     setState(() {
       _isLoading = true;
     });
     final user =
-    await Provider.of<Auth>(context, listen: false).signInAnonymously();
+        await Provider.of<Auth>(context, listen: false).signInAnonymously();
     setState(() {
       _isLoading = false;
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +49,14 @@ class _SignInPageState extends State<SignInPage> {
               onPressed: _isLoading
                   ? null
                   : () async {
-                await _signInAnonymously();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => HomePage(),
-                  ),
-                );
-              },
+                      await _signInAnonymously();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => HomePage(),
+                        ),
+                      );
+                    },
             ),
             SizedBox(
               height: 10,
@@ -81,16 +67,14 @@ class _SignInPageState extends State<SignInPage> {
               onPressed: _isLoading
                   ? null
                   : () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EmailSignInPage(),
-                  ),
-                );
-              },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EmailSignInPage(),
+                        ),
+                      );
+                    },
             ),
-            SizedBox(height: 10,),
-            MyRaisedButton(color: Colors.green, onPressed: _onPressed, child: Text('Collection'),),
             SizedBox(
               height: 10,
             ),
