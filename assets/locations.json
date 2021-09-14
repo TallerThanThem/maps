@@ -1,0 +1,81 @@
+{
+  "offices": [
+    {
+      "address": "a",
+      "id": "aarhus",
+      "image": "https://lh3.googleusercontent.com/tpBMFN5os8K-qXIHiAX5SZEmN5fCzIGrj9FdJtbZPUkC91ookSoY520NYn7fK5yqmh1L1m3F2SJA58v6Qps3JusdrxoFSwk6Ajv2K88",
+      "lat": 56.172249,
+      "lng": 10.187372,
+      "name": "Aarhus",
+      "phone": "",
+      "region": "europe"
+    },
+    {
+      "address": "s",
+      "id": "amsterdam",
+      "image": "https://lh3.googleusercontent.com/gG1zKXcSmRyYWHwUn2Z0MITpdqwb52RAEp3uthG2J5Xl-4_Wz7_WmoM6T_TBg6Ut3L1eF-8XENO10sxVIFdQHilj8iRG29wROpSoug",
+      "lat": 52.337801,
+      "lng": 4.872066,
+      "name": "Amsterdam",
+      "phone": "",
+      "region": "europe"
+    },
+    {
+      "address": "d",
+      "id": "ann-arbor",
+      "image": "https://lh3.googleusercontent.com/Iim0OVcAgg9vmXc5ADn9KvOQFplrMZ8hBTg2biiTtuWPy_r56cy4Byx1ROk6coGt7knQdmx_jO45VX1kiCJZ0QzEtS97AP_BYG4F2w",
+      "lat": 42.3063848,
+      "lng": -83.7140833,
+      "name": "Ann Arbor",
+      "phone": "+1 734-332-6500",
+      "region": "north-america"
+    }
+  ],
+  "regions": [
+    {
+      "coords": {
+        "lat": 2.9660291,
+        "lng": 1.3271339
+      },
+      "id": "africa-middle-east",
+      "name": "Africa & Middle East",
+      "zoom": 3.0
+    },
+    {
+      "coords": {
+        "lat": 0.0524811,
+        "lng": 127.6560787
+      },
+      "id": "asia-pacific",
+      "name": "Asia Pacific",
+      "zoom": 3.0
+    },
+    {
+      "coords": {
+        "lat": 46.1352815,
+        "lng": 7.4033438
+      },
+      "id": "europe",
+      "name": "Europe",
+      "zoom": 4.0
+    },
+    {
+      "coords": {
+        "lat": -17.5554497,
+        "lng": -99.2316195
+      },
+      "id": "latin-america",
+      "name": "Latin America",
+      "zoom": 3.0
+    },
+    {
+      "coords": {
+        "lat": 45.7128252,
+        "lng": -97.1547448
+      },
+      "id": "north-america",
+      "name": "North America",
+      "zoom": 4.0
+    }
+  ]
+}
